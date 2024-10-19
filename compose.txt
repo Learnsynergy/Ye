@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: symfony_app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=dev
+      - DATABASE_URL=postgresql://symfony:symfony@db:5432/ma_base_de_donnees
+
+  db:
+    image: postgres:14
+    container_name: postgresql_db
+    environment:
+      POSTGRES_DB: ma_base_de_donnees
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  react-native:
+    image: node:18
+    container_name: react_native
+    working_dir: /app
+    volumes:
+      - ../react-native:/app
+    command: npm install && npm start
+    ports:
+      - "19000:19000" # Exemple de port pour Expo
+
+volumes:
+  db_data:
+    driver: local
